@@ -1,4 +1,4 @@
-function LandingPage() {
+function Home() {
   return (
     <div className="bg-gray-50">
       {/* Hero Section */}
@@ -171,4 +171,4 @@ function LandingPage() {
   );
 }
 
-export default LandingPage;
+export default Home;
