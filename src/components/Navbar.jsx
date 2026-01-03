@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 /**
@@ -14,6 +14,8 @@ import { Link, useLocation } from 'react-router-dom';
 function Navbar() {
   // State for mobile menu toggle
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState(null);
   
   // Get current location for active route highlighting
   const location = useLocation();
@@ -44,10 +46,26 @@ function Navbar() {
   // Navigation links configuration
   const navLinks = [
     { path: '/', label: 'Home' },
-    { path: '/civilian', label: 'Report Pothole' },
-    { path: '/civilian', label: 'Civilian Dashboard', mobileLabel: 'Dashboard' },
+    
     { path: '/admin', label: 'Admin Dashboard', mobileLabel: 'Admin' },
   ];
+
+  useEffect(() => {
+    const updateAuth = () => {
+      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
+      setUserRole(localStorage.getItem('userRole'));
+    };
+    updateAuth();
+    window.addEventListener('storage', updateAuth);
+    return () => window.removeEventListener('storage', updateAuth);
+  }, []);
+
+  const visibleLinks = navLinks.filter((link) => {
+    if (link.path === '/') return true;
+    if (link.path === '/civilian') return isLoggedIn && userRole === 'civilian';
+    if (link.path === '/admin') return isLoggedIn && userRole === 'admin';
+    return true;
+  });
 
   return (
     <nav className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white shadow-lg sticky top-0 z-50">
@@ -89,7 +107,7 @@ function Navbar() {
 
           {/* Desktop Navigation Links - Hidden on mobile */}
           <div className="hidden md:flex items-center space-x-1">
-            {navLinks.map((link, index) => (
+            {visibleLinks.map((link, index) => (
               <Link
                 key={`${link.path}-${index}`}
                 to={link.path}
@@ -102,18 +120,31 @@ function Navbar() {
                 {link.label}
               </Link>
             ))}
-            
-            {/* Login Button - Highlighted */}
-            <Link
-              to="/login"
-              className={`ml-2 px-5 py-2 rounded-lg font-semibold transition-all duration-200 ${
-                isActive('/login')
-                  ? 'bg-green-600 text-white shadow-lg'
-                  : 'bg-green-500 hover:bg-green-600 text-white shadow-md hover:shadow-lg'
-              }`}
-            >
-              Login
-            </Link>
+
+            {/* Auth-aware Button - Highlighted */}
+            {!isLoggedIn ? (
+              <Link
+                to="/login"
+                className={`ml-2 px-5 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                  isActive('/login')
+                    ? 'bg-green-600 text-white shadow-lg'
+                    : 'bg-green-500 hover:bg-green-600 text-white shadow-md hover:shadow-lg'
+                }`}
+              >
+                Login
+              </Link>
+            ) : (
+              <Link
+                to={userRole === 'admin' ? '/admin' : '/civilian'}
+                className={`ml-2 px-5 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                  isActive(userRole === 'admin' ? '/admin' : '/civilian')
+                    ? 'bg-green-600 text-white shadow-lg'
+                    : 'bg-green-500 hover:bg-green-600 text-white shadow-md hover:shadow-lg'
+                }`}
+              >
+                {userRole === 'admin' ? 'Admin Dashboard' : 'Civilian Dashboard'}
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button - Visible only on mobile */}
@@ -161,7 +192,7 @@ function Navbar() {
         {isMobileMenuOpen && (
           <div className="md:hidden pb-4 animate-fadeIn">
             <div className="flex flex-col space-y-2">
-              {navLinks.map((link, index) => (
+              {visibleLinks.map((link, index) => (
                 <Link
                   key={`mobile-${link.path}-${index}`}
                   to={link.path}
@@ -172,23 +203,36 @@ function Navbar() {
                       : 'hover:bg-blue-700 hover:text-blue-100'
                   }`}
                 >
-                  {/* Use mobile label if available, otherwise use regular label */}
                   {link.mobileLabel || link.label}
                 </Link>
               ))}
               
-              {/* Login Button - Mobile */}
-              <Link
-                to="/login"
-                onClick={closeMobileMenu}
-                className={`px-4 py-3 rounded-lg font-semibold transition-all duration-200 ${
-                  isActive('/login')
-                    ? 'bg-green-600 text-white border-l-4 border-green-300'
-                    : 'bg-green-500 hover:bg-green-600 text-white'
-                }`}
-              >
-                Login
-              </Link>
+              {/* Auth-aware Button - Mobile */}
+              {!isLoggedIn ? (
+                <Link
+                  to="/login"
+                  onClick={closeMobileMenu}
+                  className={`px-4 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                    isActive('/login')
+                      ? 'bg-green-600 text-white border-l-4 border-green-300'
+                      : 'bg-green-500 hover:bg-green-600 text-white'
+                  }`}
+                >
+                  Login
+                </Link>
+              ) : (
+                <Link
+                  to={userRole === 'admin' ? '/admin' : '/civilian'}
+                  onClick={closeMobileMenu}
+                  className={`px-4 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                    isActive(userRole === 'admin' ? '/admin' : '/civilian')
+                      ? 'bg-green-600 text-white border-l-4 border-green-300'
+                      : 'bg-green-500 hover:bg-green-600 text-white'
+                  }`}
+                >
+                  {userRole === 'admin' ? 'Admin Dashboard' : 'Civilian Dashboard'}
+                </Link>
+              )}
             </div>
           </div>
         )}

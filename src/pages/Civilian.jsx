@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 function CivilianDashboard() {
   // Mock complaint data
@@ -142,12 +143,13 @@ function CivilianDashboard() {
               <h2 className="text-xl font-bold text-gray-800 mb-2">Report a New Issue</h2>
               <p className="text-gray-600 text-sm">Help improve road safety by reporting potholes</p>
             </div>
-            <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-md flex items-center justify-center gap-2 whitespace-nowrap">
+            <Link 
+              to="/report-pothole" className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow-md flex items-center justify-center gap-2 whitespace-nowrap">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Report New Pothole
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -239,9 +241,9 @@ function CivilianDashboard() {
                       </div>
                     </div>
 
-                    <button className="w-full bg-blue-50 hover:bg-blue-100 text-blue-900 font-medium py-2 rounded-lg transition-colors text-sm">
+                    <Link to={`/complaints/${complaints.id}`} className="w-full bg-blue-50 hover:bg-blue-100 text-blue-900 font-medium py-2 px-4 rounded-lg transition-colors text-sm">
                       View Details
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}

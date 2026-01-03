@@ -1,4 +1,17 @@
+import { useNavigate } from 'react-router-dom';
+
 function Home() {
+  const navigate = useNavigate();
+
+  const handleReportClick = () => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (isLoggedIn) {
+      navigate('/civilian');
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
     <div className="bg-gray-50">
       {/* Hero Section */}
@@ -12,12 +25,10 @@ function Home() {
               Help improve road infrastructure by reporting potholes and road damage in your community. Together, we can make our roads safer for everyone.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-colors shadow-lg">
+              <button onClick={handleReportClick} className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-colors shadow-lg">
                 Report a Pothole
               </button>
-              <button className="bg-white hover:bg-gray-100 text-blue-900 font-semibold px-8 py-4 rounded-lg text-lg transition-colors shadow-lg">
-                Admin Login
-              </button>
+          
             </div>
           </div>
         </div>
